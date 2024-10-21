@@ -1,0 +1,85 @@
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-4">Available Rooms</h2>
+    <div id="roomDataContainer" class="row justify-content-center">
+    </div>
+    <button class="btn btn-secondary mt-3" onclick="window.location.href='/rooms'">Back to Rooms</button>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function() {
+        const roomType = localStorage.getItem("roomType");
+        const token = localStorage.getItem("authToken");
+
+        fetchAvailableRooms(roomType); 
+
+        async function fetchAvailableRooms(roomType) {
+            let response = await fetch(`/${roomType}Availability`, {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": token
+                }
+            });
+
+            if (response.ok) {
+                const rooms = await response.json();
+                displayRooms(rooms);
+            } else {
+                const errorResponse = await response.json();
+                alert(errorResponse.error || "Unable to fetch room availability.");
+            }
+        }
+
+        function displayRooms(rooms) {
+            const container = $("#roomDataContainer");
+            container.empty();
+
+            if (rooms && rooms.length > 0) {
+                rooms.forEach(room => {
+                    const roomHTML = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-primary">Room Type: ${room.room_type}</h5>
+                                    <p class="text-muted">Gender: ${room.gender}</p>
+                                    <p class="text-muted">Available Capacity: ${room.available_capacity}</p>
+                                    <button class="btn btn-success book-room-btn" data-room-id="${room.room_id}">Book This Room</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.append(roomHTML)
+                });
+
+                $(".book-room-btn").click(async function() {
+                    const roomId = $(this).data("room-id")
+                    await bookRoom(roomId)
+                });
+            } else {
+                container.append("<p class='text-center'>No available rooms found.</p>");
+            }
+        }
+
+        async function bookRoom(roomId) {
+            const token = localStorage.getItem("authToken"); 
+
+            let response = await fetch("/bookRoom", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": token
+                },
+                body: JSON.stringify({ roomId })
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                window.location.reload()
+            } else {
+                alert(result.error || "An error occurred while booking the room.")
+            }
+        }
+    });
+</script>

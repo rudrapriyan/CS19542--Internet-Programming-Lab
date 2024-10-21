@@ -1,0 +1,53 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Login</h2>
+            <div class="card">
+                <div class="card-body">
+                        <div class="mb-3">
+                            <label for="roll" class="form-label">Roll Number</label>
+                            <input type="text" class="form-control" id="roll" name="roll" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwd" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="passwd" name="passwd" required>
+                        </div>
+                        <div class="d   -flex justify-content-between">
+                            <button type="button" class="btn btn-primary" id="login">Login</button>
+                            <a  class="btn btn-link" id="sign">Sign Up</a>
+                        </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<script>
+    $(document).ready(function(){
+        $("#login").click(async function(){
+            const roll = document.getElementById("roll").value;
+            const passwd = document.getElementById("passwd").value;
+
+            let result = await fetch("/login", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ roll, passwd })
+            });
+            
+            if(result.status !== 401) {
+                const token = await result.json();
+                localStorage.setItem("authToken", `Bearer ${token}`);
+                window.location.href = "/rooms";
+            } else {
+                alert("Invalid Username or Password");
+            }
+        });
+        $("#sign").click(function(){
+            window.location.href = "/signup";
+        })
+    });
+</script>
+

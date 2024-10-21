@@ -1,0 +1,34 @@
+<div class="container mt-5">
+    <h2 class="text-center text-primary mb-5">Available Rooms</h2>
+    <div class="row justify-content-center">
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100 text-center">
+
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Single Room</h5>
+                    <p class="card-text text-muted">A private room with all the necessary amenities for a comfortable stay.</p>
+                    <button class="btn btn-outline-primary btn-block" id="singleBooking" onclick="navigateToAvailability('single')">Book Now</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-5 mb-4">
+            <div class="card shadow-sm border-0 h-100 text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">Triple Room</h5>
+                    <p class="card-text text-muted">A spacious room suitable for three occupants, perfect for friends or groups.</p>
+                    <button class="btn btn-outline-primary btn-block" id="tripleBooking" onclick="navigateToAvailability('triple')">Book Now</button>
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    function navigateToAvailability(roomType) {
+        localStorage.setItem("roomType", roomType); 
+        window.location.href = '/roomAvailability';
+    }
+</script>
