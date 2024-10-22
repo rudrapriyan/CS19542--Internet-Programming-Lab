@@ -105,6 +105,6 @@ This table stores information about room bookings made by students.
 ```
 ### Running the Application
 ```bash
-    npm index.js
+    node index.js
 ```
 
