@@ -9,7 +9,7 @@ const jwtPassword = "secret_123"
 const saltRounds = 10;
 const app = express()
 
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 app.set("view engine", "ejs")
 app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
@@ -196,6 +196,50 @@ app.post("/bookRoom", validateToken, async (req, res) => {
     });
 });
 
+app.get("/myBookings", validateToken, (req, res) => {
+    const roll = req.roll;
+    const query = "SELECT b.booking_id, r.room_type, r.room_id FROM bookings b JOIN rooms r ON b.room_id = r.room_id WHERE b.roll_number = ?";
+
+    db.query(query, [roll], (err, result) => {
+        if (err) {
+            return res.status(400).send({ error: "Failed to fetch bookings" });
+        }
+
+        res.send(result);
+    });
+});
+
+app.delete("/cancelBooking/:bookingId", validateToken, (req, res) => {
+    const bookingId = req.params.bookingId;
+    const roll = req.roll;
+
+    const findBookingQuery = "SELECT room_id FROM bookings WHERE booking_id = ? AND roll_number = ?";
+    db.query(findBookingQuery, [bookingId, roll], (err, result) => {
+        if (err || result.length === 0) {
+            return res.status(400).send({ error: "Booking not found or permission denied" });
+        }
+
+        const roomId = result[0].room_id;
+
+        // Delete the booking
+        const deleteBookingQuery = "DELETE FROM bookings WHERE booking_id = ?";
+        db.query(deleteBookingQuery, [bookingId], (err, deleteResult) => {
+            if (err) {
+                return res.status(500).send({ error: "Failed to cancel booking" });
+            }
+
+            // Increment room capacity
+            const incrementCapacityQuery = "UPDATE rooms SET available_capacity = available_capacity + 1 WHERE room_id = ?";
+            db.query(incrementCapacityQuery, [roomId], (err, updateResult) => {
+                if (err) {
+                    return res.status(500).send({ error: "Failed to update room capacity" });
+                }
+
+                res.send({ message: "Booking canceled successfully" });
+            });
+        });
+    });
+});
 
 
 

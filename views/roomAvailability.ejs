@@ -1,7 +1,10 @@
 <div class="container mt-5">
     <h2 class="text-center text-primary mb-4">Available Rooms</h2>
-    <div id="roomDataContainer" class="row justify-content-center">
-    </div>
+    <div id="roomDataContainer" class="row justify-content-center"></div>
+
+    <h2 class="text-center text-danger mt-5 mb-4">My Bookings</h2>
+    <div id="bookingDataContainer" class="row justify-content-center"></div>
+
     <button class="btn btn-secondary mt-3" onclick="window.location.href='/rooms'">Back to Rooms</button>
 </div>
 
@@ -12,6 +15,8 @@
         const token = localStorage.getItem("authToken");
 
         fetchAvailableRooms(roomType); 
+        fetchUserBookings(); 
+
 
         async function fetchAvailableRooms(roomType) {
             let response = await fetch(`/${roomType}Availability`, {
@@ -31,6 +36,22 @@
             }
         }
 
+        async function fetchUserBookings() {
+            let response = await fetch("/myBookings", {
+                method: "GET",
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            if (response.ok) {
+                const bookings = await response.json();
+                displayBookings(bookings);
+            } else {
+                const errorResponse = await response.json();
+                alert(errorResponse.error || "Unable to fetch bookings.");
+            }
+        }
         function displayRooms(rooms) {
             const container = $("#roomDataContainer");
             container.empty();
@@ -42,28 +63,54 @@
                             <div class="card shadow-sm border-0 h-100">
                                 <div class="card-body text-center">
                                     <h5 class="card-title text-primary">Room Type: ${room.room_type}</h5>
-                                    <p class="text-muted">Gender: ${room.gender}</p>
+                                    <p class="text-muted">Room No.: ${room.room_id}</p>
                                     <p class="text-muted">Available Capacity: ${room.available_capacity}</p>
                                     <button class="btn btn-success book-room-btn" data-room-id="${room.room_id}">Book This Room</button>
                                 </div>
                             </div>
                         </div>
                     `;
-                    container.append(roomHTML)
+                    container.append(roomHTML);
                 });
 
                 $(".book-room-btn").click(async function() {
-                    const roomId = $(this).data("room-id")
-                    await bookRoom(roomId)
+                    const roomId = $(this).data("room-id");
+                    await bookRoom(roomId);
                 });
             } else {
                 container.append("<p class='text-center'>No available rooms found.</p>");
             }
         }
+        function displayBookings(bookings) {
+            const container = $("#bookingDataContainer");
+            container.empty();
+
+            if (bookings && bookings.length > 0) {
+                bookings.forEach(booking => {
+                    const bookingHTML = `
+                        <div class="col-md-4 mb-4">
+                            <div class="card shadow-sm border-0 h-100">
+                                <div class="card-body text-center">
+                                    <h5 class="card-title text-danger">Booked Room: ${booking.room_type}</h5>
+                                    <p class="text-muted">Room ID: ${booking.room_id}</p>
+                                    <button class="btn btn-danger cancel-booking-btn" data-booking-id="${booking.booking_id}">Cancel Booking</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    container.append(bookingHTML);
+                });
+
+                $(".cancel-booking-btn").click(async function() {
+                    const bookingId = $(this).data("booking-id");
+                    await cancelBooking(bookingId);
+                });
+            } else {
+                container.append("<p class='text-center'>You have no current bookings.</p>");
+            }
+        }
 
         async function bookRoom(roomId) {
-            const token = localStorage.getItem("authToken"); 
-
             let response = await fetch("/bookRoom", {
                 method: "POST",
                 headers: {
@@ -76,9 +123,25 @@
             const result = await response.json();
             if (response.ok) {
                 alert(result.message);
-                window.location.reload()
+                window.location.reload();
             } else {
-                alert(result.error || "An error occurred while booking the room.")
+                alert(result.error || "An error occurred while booking the room.");
+            }
+        }
+        async function cancelBooking(bookingId) {
+            let response = await fetch(`/cancelBooking/${bookingId}`, {
+                method: "DELETE",
+                headers: {
+                    "Authorization": token
+                }
+            });
+
+            const result = await response.json();
+            if (response.ok) {
+                alert(result.message);
+                window.location.reload();
+            } else {
+                alert(result.error || "An error occurred while canceling the booking.");
             }
         }
     });
