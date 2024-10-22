@@ -1,4 +1,5 @@
 const db = require("./db")
+require('dotenv').config()
 const express  = require("express")
 const expressLayouts = require("express-ejs-layouts");
 const path = require("path")
@@ -14,6 +15,7 @@ app.set("views", path.join(__dirname, "views"));
 app.use(express.urlencoded({ extended: true }));
 app.use(expressLayouts);
 
+const port = process.env.PORT || 3001
 
 async function authentication(req, res, next) {
     const roll = req.body.roll;
@@ -197,4 +199,4 @@ app.post("/bookRoom", validateToken, async (req, res) => {
 
 
 
-app.listen(3001);
+app.listen(port);
