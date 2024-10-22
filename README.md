@@ -74,3 +74,37 @@ This table stores information about room bookings made by students.
 
 3. Insert the Room Data
 
+### Prerequisites
+- Node.js (v14 or higher)
+- MySQL Server
+
+### Installation
+1. Clone the repository:
+```bash
+   git clone https://github.com/rudrapriyan/CS19542--Internet-Programming-Lab 
+```
+
+2. Navigate to the project directory
+```bash
+   cd CS19542--Internet-Programming-Lab 
+```
+3. Install dependencies
+```bash
+   npm install 
+```
+
+### Configuration
+1. Create a .env file in the root of the project and set the following variables:
+```makefile
+    HOST=your_mysql_host
+    DB_PORT=your_mysql_port
+    USER=your_mysql_user
+    PASSWORD=your_mysql_password
+    DB=hostel
+    PORT=set_your_desired_port
+```
+### Running the Application
+```bash
+    npm start
+```
+
