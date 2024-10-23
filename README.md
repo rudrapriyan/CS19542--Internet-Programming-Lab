@@ -1,5 +1,23 @@
 # Hostel Management System
 
+## Screenshots
+
+#### Login Page
+![Screenshot](./public/login.jpeg)
+
+#### Sign Up Page
+![Screenshot](./public/signup.jpeg)
+
+#### Rooms Page
+![Screenshot](./public/rooms.jpeg)
+
+#### Rooms Availability Page
+![Screenshot](./public/roomAvailabilty.jpeg)
+&nbsp;&nbsp;&nbsp;&nbsp;*After Booking*
+![Screenshot](./public/myBookings.jpeg)
+
+
+
 ## Requirements
 
 To run this application, you need a MySQL database named **hostel** with the following tables:
